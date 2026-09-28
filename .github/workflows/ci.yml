@@ -46,6 +46,7 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: gradle
+      - run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends fonts-nanum
       - run: chmod +x gradlew
       - run: ./gradlew test check bootJar --no-daemon
 

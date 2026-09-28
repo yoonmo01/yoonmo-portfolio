@@ -1,27 +1,45 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page, type Route } from "@playwright/test";
 
-test.beforeEach(async ({ page }) => {
-  await page.route("**/api/**", async (route) => mockApi(route));
-});
-
 test("public portfolio is accessible and responsive", async ({ page }) => {
   await page.goto("/");
-  await expect(page).toHaveTitle(/Portfolio Hub/);
-  await expect(page.getByRole("heading", { level: 1, name: "문제를 구조화하고, 검증 가능한 제품으로 만듭니다." })).toBeVisible();
+  await expect(page).toHaveTitle("양윤모 | AX Engineer · AI Agent · Backend Engineer");
+  await expect(page.getByRole("heading", { level: 1, name: "양윤모" })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "주 메뉴" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "관리자" })).toHaveAttribute("href", "/admin");
-  await expect(page.getByText("공개된 프로젝트가 아직 없습니다.")).toBeVisible();
+  await expect(page.getByRole("link", { name: "관리자" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "VishBox v2", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Experience" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Awards" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Papers" })).toBeVisible();
   await assertNoHorizontalOverflow(page);
   await assertNoSeriousAccessibilityViolations(page);
 
   await page.getByRole("link", { name: "프로젝트", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1, name: "프로젝트" })).toBeVisible();
-  await expect(page.getByText("공개된 프로젝트가 아직 없습니다.")).toBeVisible();
+  await expect(page.getByRole("link", { name: "POLYSTEP" })).toBeVisible();
   await assertNoHorizontalOverflow(page);
 });
 
+test("six studies render with evidence on desktop and 360px mobile", async ({ page }) => {
+  for (const width of [1280, 360]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const slug of ["vishbox-v2", "legal-translation-review", "public-audit-ai-viewer", "auth-security-audit", "vishbox", "polystep"]) {
+      await page.goto(`/projects/${slug}`);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      await assertNoHorizontalOverflow(page);
+    }
+    await page.goto("/");
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "본문으로 건너뛰기" })).toBeFocused();
+    await assertNoHorizontalOverflow(page);
+  }
+  const missing = await page.goto("/projects/no-such-project");
+  expect(missing?.status()).toBe(404);
+});
+
 test("administrator can complete the mocked login flow", async ({ page }) => {
+  await page.route("**/api/**", async (route) => mockApi(route));
   await page.goto("/admin/login");
   await page.getByLabel("이메일").fill("admin@example.com");
   await page.getByLabel("비밀번호").fill("correct-horse-battery-staple");
