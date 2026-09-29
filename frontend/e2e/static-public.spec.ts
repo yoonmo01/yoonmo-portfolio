@@ -107,6 +107,8 @@ test("language link preserves the public route and shows English content", async
 });
 
 test("all English project pages include complete English case studies", async ({ page }) => {
+  await page.goto("/en/projects");
+  await expect(page.getByRole("img", { name: "AUTH flow from evidence ingestion to agent analysis and employee response" })).toHaveAttribute("src", /system-flow-en\.svg/);
   for (const [slug] of projects) {
     const response = await page.goto(`/en/projects/${slug}`);
     expect(response?.status()).toBe(200);

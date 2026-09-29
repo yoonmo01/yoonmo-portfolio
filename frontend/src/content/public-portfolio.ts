@@ -50,7 +50,7 @@ export const portfolio = {
       caseStudy: {
         problem: "대화 전체의 현실성만으로는 각 대화 단계의 전략과 피해자 상태 변화가 어떻게 이어지는지 살펴보기 어려웠습니다.",
         goal: "절차에 따른 대화 생성과 단계별 상태 분석을 함께 기록해 연구자가 결과를 검토할 수 있도록 합니다.",
-        implementation: "Main Agent와 호출 Tool 전반을 설계·구현하고, MCP Dialogue Agent를 공격 계획·발화·피해자 응답으로 분리했습니다. Emotion Tool에서 감정 8종을 HMM 입력 4종으로 매핑하고, Guidance Tool에 감정 값을 반영했으며 라운드 판정 Tool에서 감정 기반 취약점을 추출했습니다. Agent에 전달하는 상태 출력은 최종 값 중심으로 축약했습니다.",
+        implementation: "Main Agent와 호출 Tool 전반을 설계·구현하고, MCP Dialogue Agent를 공격 계획·발화·피해자 응답으로 분리했습니다. Emotion Tool에서 감정 8종을 HMM 관찰 기호 4종으로 매핑하고, Guidance Tool에 감정 값을 반영했으며 라운드 판정 Tool에서 감정 기반 취약점을 추출했습니다. Agent에 전달하는 상태 출력은 최종 값 중심으로 축약했습니다.",
         limitations: "특정 사칭 유형을 다룬 합성 대화 연구입니다. 평가 수치는 팀 전체 시스템의 결과이며 개인 구현 범위와 구분합니다.",
         reflection: "최종 대화뿐 아니라 어떤 단계와 상태를 거쳐 결과가 만들어졌는지 기록하는 것이 중요했습니다.",
       },

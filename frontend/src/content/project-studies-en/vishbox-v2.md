@@ -6,10 +6,12 @@
 
 - **Main Agent and tools:** Designed and implemented the Main Agent that coordinates the simulation and the tools it calls. Connected prompt construction, MCP dialogue execution, emotion labeling, guidance generation, and round judgment.
 - **MCP Dialogue Agent:** Separated the attacker's procedural planning (Planner), actual utterance generation (Realizer), and victim response so the dialogue advances in stages.
-- **Emotion and judgment tools:** Mapped the eight emotions output by Hugging Face's HowRU-KoELECTRA to the four HMM input states. Handled “surprise” according to threat and refusal cues in the utterance and used the converted sequence to estimate victim state. Fed emotion values into the Guidance Tool and extracted emotion-related vulnerabilities in the round judgment tool for the Main Agent's next step.
+- **Emotion and judgment tools:** Mapped the eight emotions output by Hugging Face's HowRU-KoELECTRA to four HMM observation symbols (N/F/A/E), which the HMM uses to estimate three latent vulnerability states (V1–V3). In the current repository implementation, handled “surprise” according to threat and refusal cues in the utterance. Fed emotion values into the Guidance Tool and extracted emotion-related vulnerabilities in the round judgment tool for the Main Agent's next step.
 - **Stable agent input:** Passing all intermediate emotion predictions and HMM outputs to the agent caused malformed JSON responses. I reduced the handoff to the final state values after the calculations.
 
 The experimental results below belong to the **team's complete system**. The overall architecture includes the Tactic Search Agent; my directly implemented scope is described above.
+
+The [published paper's emotion-mapping appendix](https://aclanthology.org/2026.acl-industry.145.pdf) maps Surprise to Excitement. The current repository's cue-based routing differs from that description; the paper's results do not evaluate that routing change separately.
 
 ## What changed from v1?
 
@@ -94,7 +96,7 @@ The experts also noted repetitive expressions and threats that were less intense
 
 ### 2. Procedural position mattered more than the tactic alone
 
-The same tactic led to different outcomes depending on where it appeared in the four-stage crime script.
+In the six-stage procedure represented by `proc_code`, success rates differed sharply between patterns that developed a stage and patterns that skipped ahead.
 
 | Procedure pattern | Success rate |
 |---|---:|
@@ -113,7 +115,7 @@ The gap remained large when comparing 3-grams with similar frequency. Skipping t
 | Low + Medium | 0.209 | 9.53 |
 | **High + Critical** | **0.129** | **17.08** |
 
-As risk increased, **tactic variety decreased while repeated pressure increased** (*p* < .001, Hedges' *g* = 1.30). **A5 (pressure and threat)** and **A1 (authority)** accounted for **93–96%** of PPSE labels.
+**High + Critical rounds had lower tactic variety and higher tactic density** than Low + Medium rounds (*p* < .001, Hedges' *g* = 1.30).
 
 ### 4. Compliant neutrality was a stronger warning signal than fear
 
@@ -126,7 +128,7 @@ The study compared round-level emotion with the HMM-estimated probability of lat
 | **Neutrality** (compliant neutrality) | **r = 0.519** |
 | Fear | r = 0.255 |
 
-Both have *p* < .001. In these simulated dialogues, a victim who complied calmly signaled more risk than one who expressed fear; relying on fear alone could miss this pattern.
+Both have *p* < .001. In these simulated dialogues, compliant neutrality had a stronger correlation with the estimated V3 state than fear. Fear alone would miss this pattern.
 
 ### 5. The web-search paradox
 
@@ -140,6 +142,8 @@ Web search activates after two consecutive failed persuasion attempts within a c
 | OFF | 407 | 205 | **50.37%** |
 
 Rounds that brought in newer tactics had lower success rates. **Search was only activated in already difficult situations**, so this comparison cannot establish a causal effect of search. It also showed a procedural issue: introducing fake official apps, deceptive URLs, or deepfake identity checks **before establishing trust could raise suspicion instead of compliance**. Knowing a new tactic and using it at the right stage are different things.
+
+Within the **web-search-augmented tactic categories**, **A5 (pressure and threat)** and **A1 (authority)** accounted for roughly **93–96%** of PPSE labels. This percentage does not describe every round in the study.
 
 ---
 

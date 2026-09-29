@@ -92,7 +92,7 @@ Participants identified real versus generated conversations with **48.04%** accu
 | Education | χ² = 0.56, *p* = 0.756 |
 | Logistic regression (gender, age, education) | χ² = 0.98, *p* = 0.980 |
 
-**No demographic group performed significantly better.** This supports the finding that the generated conversations were not convincing only to one group.
+The analysis **did not detect a statistically significant difference** in identification performance by gender, age group, or education. This does not establish that performance was identical across those groups.
 
 ### 2. Age-related vulnerability and real victimization patterns
 
