@@ -106,6 +106,27 @@ test("language link preserves the public route and shows English content", async
   await assertNoSeriousAccessibilityViolations(page);
 });
 
+test("all English project pages include complete English case studies", async ({ page }) => {
+  await page.goto("/en/projects");
+  await expect(page.getByRole("img", { name: "AUTH flow from evidence ingestion to agent analysis and employee response" })).toHaveAttribute("src", /system-flow-en\.svg/);
+  for (const [slug] of projects) {
+    const response = await page.goto(`/en/projects/${slug}`);
+    expect(response?.status()).toBe(200);
+    const study = page.getByRole("heading", { name: "Full case study" }).locator("..");
+    await expect(study.getByRole("heading", { name: "My contribution and implementation" })).toBeVisible();
+    expect(await study.innerText()).not.toMatch(/[가-힣]/);
+    if (slug === "auth-security-audit") {
+      await expect(study.locator("figure[role='img'] svg")).toHaveCount(5);
+      const flow = study.getByRole("img", { name: /AUTH system flow/ });
+      await expect(flow).toHaveAttribute("src", /system-flow-en\.svg/);
+      const artwork = await page.request.get("/projects/AUTH/system-flow-en.svg");
+      expect(artwork.status()).toBe(200);
+      expect(await artwork.text()).not.toMatch(/[가-힣]/);
+    }
+    await assertNoHorizontalOverflow(page);
+  }
+});
+
 test("production admin and API routes are unavailable", async ({ request }) => {
   test.skip(!process.env.PLAYWRIGHT_BASE_URL, "Run against a production-mode build or Vercel preview");
   for (const path of ["/admin", "/admin/login", "/admin/resumes", "/api/admin/projects", "/api/public/projects"]) {

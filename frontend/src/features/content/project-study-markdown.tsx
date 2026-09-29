@@ -23,6 +23,7 @@ const imageSizes: Record<string, [number, number]> = {
   "/projects/AUDIT/audit-map.png": [1365, 1992],
   "/projects/AUDIT/audit-chart.png": [1365, 900],
   "/projects/AUTH/system-flow.svg": [720, 500],
+  "/projects/AUTH/system-flow-en.svg": [720, 500],
 };
 const openingImages = new Set([
   "/projects/VP2/fig1-architecture.png",
@@ -30,9 +31,10 @@ const openingImages = new Set([
   "/projects/POLYSTEP/fig3-home.png",
   "/projects/AUDIT/audit-home.png",
   "/projects/AUTH/system-flow.svg",
+  "/projects/AUTH/system-flow-en.svg",
 ]);
 
-export function ProjectStudyMarkdown({ content }: { content: string }) {
+export function ProjectStudyMarkdown({ content, locale = "ko" }: { content: string; locale?: "ko" | "en" }) {
   return <div className="mt-12 min-w-0">
     <Markdown remarkPlugins={[remarkGfm]} components={{
       h2: ({ children }) => <h2 className="mb-4 mt-12 text-2xl font-semibold tracking-[-0.02em]">{children}</h2>,
@@ -47,14 +49,14 @@ export function ProjectStudyMarkdown({ content }: { content: string }) {
       pre: ({ children }) => {
         const code = Children.only(children) as ReactElement<{ className?: string; children?: string }>;
         if (isValidElement(code) && code.props.className === "language-mermaid") {
-          return <MermaidDiagram source={String(code.props.children)} />;
+          return <MermaidDiagram source={String(code.props.children)} locale={locale} />;
         }
         return <pre className="my-6 overflow-x-auto rounded-md border border-line bg-surface p-4 text-sm leading-6" tabIndex={0}>{children}</pre>;
       },
       img: ({ src, alt }) => {
         const size = typeof src === "string" ? imageSizes[src] : undefined;
         if (!size || typeof src !== "string") return null;
-        if (src === "/projects/VP/fig2-mcp-dialogue.png") return <a aria-label="MCP 대화 구조 원본 크게 보기" className="mx-auto my-7 flex w-full max-w-md flex-col items-center gap-3 rounded-md border border-line bg-white p-5 text-xs font-semibold text-accent-strong hover:border-accent focus-visible:outline-2 focus-visible:outline-accent" href={src} rel="noreferrer" target="_blank"><Image src={src} alt={alt ?? ""} width={size[0]} height={size[1]} loading="lazy" className="h-auto max-h-[32rem] w-auto max-w-full object-contain" /><span>원본 크게 보기 ↗</span></a>;
+        if (src === "/projects/VP/fig2-mcp-dialogue.png") return <a aria-label={locale === "en" ? "View full-size MCP dialogue diagram" : "MCP 대화 구조 원본 크게 보기"} className="mx-auto my-7 flex w-full max-w-md flex-col items-center gap-3 rounded-md border border-line bg-white p-5 text-xs font-semibold text-accent-strong hover:border-accent focus-visible:outline-2 focus-visible:outline-accent" href={src} rel="noreferrer" target="_blank"><Image src={src} alt={alt ?? ""} width={size[0]} height={size[1]} loading="lazy" className="h-auto max-h-[32rem] w-auto max-w-full object-contain" /><span>{locale === "en" ? "View full-size image ↗" : "원본 크게 보기 ↗"}</span></a>;
         return <Image src={src} alt={alt ?? ""} width={size[0]} height={size[1]} loading={openingImages.has(src) ? "eager" : "lazy"} className="my-7 h-auto w-full max-w-full rounded-md border border-line bg-white object-contain" />;
       },
       a: ({ href, children }) => <a href={href} className="text-accent-strong underline underline-offset-4" rel={href?.startsWith("http") ? "noreferrer" : undefined} target={href?.startsWith("http") ? "_blank" : undefined}>{children}</a>,
